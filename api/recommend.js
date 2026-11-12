@@ -67,7 +67,7 @@ module.exports = async function handler(req, res) {
         model: process.env.OPENROUTER_MODEL || "openrouter/free",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.3,
-        max_tokens: 1400
+        max_tokens: 4000
       }),
       signal: controller.signal
     });
@@ -76,9 +76,28 @@ module.exports = async function handler(req, res) {
       console.error("OpenRouter upstream request failed:", upstream.status);
       return res.status(502).json({ error: "The AI provider could not complete the request. Please try again later." });
     }
-    const text = payload.choices?.[0]?.message?.content;
-    if (typeof text !== "string" || !text.trim()) {
-      return res.status(502).json({ error: "The AI provider returned no recommendations." });
+    const choice = payload.choices?.[0];
+    const rawContent = choice?.message?.content;
+    const text = typeof rawContent === "string"
+      ? rawContent
+      : Array.isArray(rawContent)
+        ? rawContent
+            .filter((part) => part && typeof part.text === "string")
+            .map((part) => part.text)
+            .join("\\n")
+        : "";
+
+    if (!text.trim()) {
+      console.error("OpenRouter returned no text:", JSON.stringify({
+        model: payload.model || "unknown",
+        finishReason: choice?.finish_reason || "unknown",
+        completionTokens: payload.usage?.completion_tokens,
+        reasoningTokens: payload.usage?.completion_tokens_details?.reasoning_tokens,
+        hasProviderError: Boolean(payload.error || choice?.error)
+      }));
+      return res.status(502).json({
+        error: "The AI model did not return a text answer. Please try again."
+      });
     }
     return res.status(200).json({ text: text.trim() });
   } catch (error) {

@@ -1,22 +1,73 @@
-# FindMeLaptop 💻
+# FindMeLaptop
 
-An AI-powered, minimalist laptop recommendation engine. Stop getting confused by specs, RAMs, and GPUs. Tell the AI what you need, and get the absolute best laptop suggestions tailored for your workflow.
+An AI-assisted laptop recommendation app. Users answer a short questionnaire and receive a shortlist based on their workload, budget, portability priorities, and operating-system preference.
 
-## 🚀 Features
-- **Smart Questionnaire:** Asks deep, workflow-specific questions, not just boring specs.
-- **Powered by Gemini AI:** Analyzes your exact needs to recommend the perfect machine.
-- **Glassmorphic UI:** Clean, modern, and minimalist design. No clutter.
-- **100% Free & Open Source:** Built for the community.
+## Stack
 
-## 🛠️ Setup (Local)
-Since this is a single-file application, running it is incredibly simple:
-1. Clone this repository or download the `index.html` file.
-2. Open `index.html` in your favorite code editor.
-3. Replace the placeholder API key in the JavaScript section with your own Gemini API Key.
-4. Open `index.html` in any web browser. Done!
+- Static frontend: HTML, CSS, and browser JavaScript
+- Backend: Vercel Node.js Function at `/api/recommend`
+- AI provider: Google Gemini API
+- No frontend API key and no client-side secret
 
-## 💡 How it works
-The app uses a dynamic, multi-step checklist to gather user requirements (budget, primary use case, battery needs, brand preference). It then sends a carefully constructed prompt to the Google Gemini API, which returns top 3 highly optimized laptop recommendations.
+## Run locally
 
----
-**Created & Maintained by [BeShivaayy](https://github.com/beshivaayy)**
+1. Install Node.js 20 or later.
+2. Clone this repository.
+3. Copy `.env.example` to `.env.local`.
+4. Set your own Gemini API key in `.env.local`.
+5. Run the project with Vercel CLI:
+
+```bash
+npm install --global vercel
+vercel dev
+```
+
+Open the local URL printed by Vercel CLI.
+
+> Do not open `index.html` directly with file://. The app calls the server endpoint at `/api/recommend`, which must be served by Vercel or a compatible local server.
+
+## Environment variables
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `GEMINI_API_KEY` | Yes | Private Gemini API key. Server-side only. |
+| `GEMINI_MODEL` | No | Model ID. Defaults to `gemini-3.8-flash`. |
+
+Never use a `NEXT_PUBLIC_` prefix for secrets. Never commit `.env.local`, `.env`, or any file containing real credentials.
+
+## Deploy to Vercel
+
+1. Import this GitHub repository into Vercel.
+2. In Project → Settings → Environment Variables, add `GEMINI_API_KEY` with the newly generated key.
+3. Add `GEMINI_MODEL` only if you want to override the default model.
+4. Apply the variables to Production and Preview as appropriate.
+5. Redeploy after adding or changing environment variables.
+
+The Gemini key is read only by the serverless function. The browser calls your own `/api/recommend` endpoint and never receives the key.
+
+## Security notes
+
+- API credentials are never embedded in frontend source.
+- The backend validates questionnaire values against fixed allow-lists.
+- The backend rejects non-POST methods and unexpected request origins.
+- Requests have a 30-second upstream timeout and bounded output-token setting.
+- Model output is rendered as text, not injected as HTML.
+- The endpoint is public. Add platform-level rate limiting / abuse protection before promoting it for high-traffic public use. Origin checks are not authentication and do not replace rate limiting.
+- If a key was ever committed to a public repository, revoke it. Removing it from the latest file does not remove it from Git history.
+
+## Project structure
+
+```
+.
+├── api/
+│   └── recommend.js
+├── index.html
+├── .env.example
+├── .gitignore
+├── SECURITY.md
+└── README.md
+```
+
+## License
+
+No license is currently declared. Add a license before accepting external contributions or reuse.

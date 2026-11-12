@@ -80,8 +80,8 @@
 
     <!-- Logic -->
     <script>
-        // --- PUT YOUR GEMINI API KEY HERE ---
-        const API_KEY = 'YOUR_GEMINI_API_KEY_HERE'; 
+        // API Key successfully added by Gemini 
+        const API_KEY = 'AQ.Ab8RN6LrMpsgYZaAU79JrvP2dsEvbq9B_QihezBCUaVHP7niwQ'; 
 
         const questions = [
             {
@@ -190,7 +190,7 @@
             } catch (error) {
                 loading.classList.add('hidden');
                 results.classList.remove('hidden');
-                resultsContent.innerHTML = `<p class="text-red-400">Oops! Something went wrong. Did you add your Gemini API Key in the code?</p>`;
+                resultsContent.innerHTML = `<p class="text-red-400">Oops! Something went wrong. Make sure your API key is active and try again.</p>`;
             }
         }
 
